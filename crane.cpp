@@ -13,7 +13,7 @@
 #define snprintf _snprintf
 #endif
 
-#include "crane.h"
+#include "crane.hpp"
 
 
 static void _mkdir(const char *path)
@@ -154,7 +154,10 @@ DLLFUNC void getApplicationLogFile(char * buf, int maxl, const char* appName)
 		strncat(buf,appName,maxl);	buf[maxl-1] = '\0';
 		strncat(buf,ext,maxl);		buf[maxl-1] = '\0';
 	}
-
+#undef backup
+#undef env
+#undef suffix
+#undef psep
 }
 
 //-----------------------------------------------------------------------------
@@ -169,6 +172,8 @@ DLLFUNC void getApplicationDataDirectory(char * buf, int maxl, const char* appNa
 #define env CSIDL_LOCAL_APPDATA
 #endif
 	searchPathForApp(buf, maxl, backup, appName, env, "data");
+#undef backup
+#undef env
 }
 
 //-----------------------------------------------------------------------------
@@ -183,6 +188,8 @@ DLLFUNC void getApplicationScriptsDirectory(char * buf, int maxl, const char* ap
 #define env CSIDL_LOCAL_APPDATA
 #endif
 	searchPathForApp(buf, maxl, backup, appName, env, "scripts");
+#undef backup
+#undef env
 }
 
 //-----------------------------------------------------------------------------

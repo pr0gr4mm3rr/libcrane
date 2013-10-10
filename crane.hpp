@@ -1,7 +1,7 @@
 #ifndef _CRANE_H_
 #define _CRANE_H_
 
-#ifdef LINUX
+#ifdef XDG_UNIX 
 #define DLLFUNC  
 #endif
 #ifdef _WINDOWS
