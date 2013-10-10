@@ -1,1 +1,16 @@
 *.dylib
+*.log
+*.obj
+*.so
+*.sdf
+*.opensdf
+*.ilk
+*.pdb
+*.idb
+*.tlog
+*.suo
+*.dll
+*.user
+*.lib
+*.lastbuildstate
+*.exp
