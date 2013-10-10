@@ -9,8 +9,11 @@
 *.idb
 *.tlog
 *.suo
+*.v11.suo
 *.dll
 *.user
 *.lib
 *.lastbuildstate
 *.exp
+*.exe
+*.ipch

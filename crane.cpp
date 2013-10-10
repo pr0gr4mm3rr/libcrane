@@ -6,22 +6,15 @@
 #ifdef XDG_UNIX
 #include <dirent.h>
 #include <unistd.h>
-#define DLLFUNC
 #endif
 #ifdef _WINDOWS
 #include <shlobj.h>
 #include <Shlwapi.h>
-#define DLLFUNC __declspec(dllexport)
 #define snprintf _snprintf
 #endif
 
-extern "C"  {
-	DLLFUNC void getApplicationLogFile(char * buf, int maxl, const char* appName);
-	DLLFUNC void getApplicationDataDirectory(char * buf, int maxl, const char* appName);
-	DLLFUNC void getApplicationScriptsDirectory(char * buf, int maxl, const char* appName);
-	DLLFUNC void getUserHomeDirectory(char * buf, int maxl);
-	DLLFUNC void getTemporaryDirectory(char * buf, int maxl);
-}
+#include "crane.h"
+
 
 static void _mkdir(const char *path)
 {
@@ -64,7 +57,7 @@ void searchPathForApp(char * buf, int maxl, const char* backupSuffix, const char
 #ifdef _WINDOWS
 	const char* templ = "%s\\%s\\%s\\%s";
 #endif
-	int templen = strlen(templ);
+	size_t templen = strlen(templ);
 	const char* templates[5] = {&(templ[templen]),&(templ[9]),&(templ[6]),&(templ[3]),templ};
 	const char* fill_ins[4] = {NULL, NULL, NULL, NULL};
 	int parts_count = 0;
@@ -80,7 +73,7 @@ void searchPathForApp(char * buf, int maxl, const char* backupSuffix, const char
 #endif
 #ifdef _WINDOWS
 	char basedir[MAX_PATH];
-	HRESULT res = SHGetFolderPath(NULL,CSIDL_PERSONAL,NULL,SHGFP_TYPE_CURRENT,basedir);
+	HRESULT res = SHGetFolderPath(NULL,folderId,NULL,SHGFP_TYPE_CURRENT,basedir);
 	if(res != S_OK){
 		fprintf(stderr, "Error: Could not acquire special directory. CSIDL=%d\n",folderId);
 		fflush(stderr);
@@ -132,7 +125,7 @@ void searchPathForApp(char * buf, int maxl, const char* backupSuffix, const char
 
 }
 
-void getApplicationLogFile(char * buf, int maxl, const char* appName)
+DLLFUNC void getApplicationLogFile(char * buf, int maxl, const char* appName)
 {
 #ifdef XDG_UNIX
 #define backup ".cache"
@@ -147,7 +140,7 @@ void getApplicationLogFile(char * buf, int maxl, const char* appName)
 #define psep "\\"
 #endif
 	searchPathForApp(buf, maxl, backup, appName, env, suffix);
-	int remainder = maxl - strlen(buf);
+	size_t remainder = maxl - strlen(buf);
 	
 	const char* ext = ".log";
 	if (remainder > 1 + strlen(appName) + 4) {
@@ -165,7 +158,7 @@ void getApplicationLogFile(char * buf, int maxl, const char* appName)
 }
 
 //-----------------------------------------------------------------------------
-void getApplicationDataDirectory(char * buf, int maxl, const char* appName)
+DLLFUNC void getApplicationDataDirectory(char * buf, int maxl, const char* appName)
 {
 #ifdef XDG_UNIX
 #define backup ".local/share"
@@ -179,7 +172,7 @@ void getApplicationDataDirectory(char * buf, int maxl, const char* appName)
 }
 
 //-----------------------------------------------------------------------------
-void getApplicationScriptsDirectory(char * buf, int maxl, const char* appName)
+DLLFUNC void getApplicationScriptsDirectory(char * buf, int maxl, const char* appName)
 {
 #ifdef XDG_UNIX
 #define backup ".local/share"
@@ -193,7 +186,7 @@ void getApplicationScriptsDirectory(char * buf, int maxl, const char* appName)
 }
 
 //-----------------------------------------------------------------------------
-void getUserHomeDirectory(char * buf, int maxl)
+DLLFUNC void getUserHomeDirectory(char * buf, int maxl)
 {
 #ifdef XDG_UNIX
 	char * homeDir = getenv("HOME");
@@ -216,7 +209,7 @@ void getUserHomeDirectory(char * buf, int maxl)
 }
 
 //-----------------------------------------------------------------------------
-void getTemporaryDirectory(char * buf, int maxl)
+DLLFUNC void getTemporaryDirectory(char * buf, int maxl)
 {
 #ifdef XDG_UNIX
 	char ttemp[14] = "/tmp/T-XXXXXX";
@@ -226,7 +219,7 @@ void getTemporaryDirectory(char * buf, int maxl)
 	const char * ttemp = "T-XXXXXX";
 	const size_t tbl = 512;
 	char tbuf[tbl], tbuf2[tbl];
-	int tct = snprintf(tbuf,tbl,"%s\\%s",getenv("TEMP"),ttemp);
+	size_t tct = snprintf(tbuf,tbl,"%s\\%s",getenv("TEMP"),ttemp);
 	if(tct == tbl && tbuf[tct-1]!='\0'){
 		fprintf(stderr, "Warning: Probable buffer overrun retrieving %%TEMP%% directory. Truncating.\n");
 		fflush(stderr);
@@ -235,7 +228,7 @@ void getTemporaryDirectory(char * buf, int maxl)
 	tct = strlen(tbuf);
 	do{
 		strcpy(tbuf2,tbuf);
-		for(int i = tct-1; tbuf[i]=='X';tct--){
+		for(size_t i = tct-1; tbuf[i]=='X';i--){
 			int cseed = rand() % (10+26*2);
 			cseed = (cseed <= 9) ? (48 + cseed) : ((cseed <= 35) ? (55 + cseed) : (61 + cseed));
 			tbuf2[i] = cseed;
