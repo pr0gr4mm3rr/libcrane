@@ -16,7 +16,7 @@ else
 endif
 endif
 
-ifeq (${OS}, "darwin")
+ifeq (${OS}, darwin)
 	SRC_EXT=m
 	SO_EXT=dylib
 	CC=clang
