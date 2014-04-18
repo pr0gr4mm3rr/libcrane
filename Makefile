@@ -34,12 +34,16 @@ TARGET_NAME=${OS}${ARCH_SUFFIX}/lib${NAME}.${SO_EXT}
 TTARGET_NAME=${OS}${ARCH_SUFFIX}/test${NAME}
 SRC_NAME=${NAME}.${SRC_EXT}
 
-${TARGET_NAME}: ${SRC_NAME}
+
+${TARGET_NAME}: ${SRC_NAME} ${OS}${ARCH_SUFFIX}
 	#Build for ${OS}${ARCH_SUFFIX}
 	${CC} ${CFLAGS} $< -o $@
 
-${TTARGET_NAME}: test${SRC_NAME}
+${TTARGET_NAME}: test${SRC_NAME} ${OS}${ARCH_SUFFIX}
 	${CC} -DXDG_UNIX -L${OS}${ARCH_SUFFIX} -l${NAME} -lstdc++ $< -o $@
+
+${OS}${ARCH_SUFFIX}:
+	mkdir $@
 
 #darwin/libcrane.dylib:
 #	clang -dynamiclib -framework Foundation crane.m -o darwin/libcrane.dylib
