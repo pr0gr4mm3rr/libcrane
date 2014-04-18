@@ -11,11 +11,12 @@
 #include <shlobj.h>
 #include <Shlwapi.h>
 #define snprintf _snprintf
+#define SHGFP_TYPE_CURRENT 0
 #endif
 
 #include "crane.hpp"
 
-
+#ifndef _WINDOWS
 static void _mkdir(const char *path)
 {
 #ifdef XDG_UNIX
@@ -39,6 +40,7 @@ static void _mkdir(const char *path)
     SHCreateDirectoryEx( NULL, path, NULL );
 #endif
 }
+#endif
 
 
 

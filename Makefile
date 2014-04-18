@@ -21,6 +21,12 @@ ifeq (${OS}, darwin)
 	SO_EXT=dylib
 	CC=clang
 	CFLAGS=-dynamiclib -framework Foundation
+else ifeq(${OS}, Windows_NT)
+	SRC_EXT=cpp
+	SO_EXT=dll
+	CC=gcc
+	CFLAGS=-D_WINDOWS -shared
+	LIB=-lshlwapi
 else
 	SRC_EXT=cpp
 	SO_EXT=so
@@ -37,7 +43,7 @@ SRC_NAME=${NAME}.${SRC_EXT}
 
 ${TARGET_NAME}: ${SRC_NAME} ${OS}${ARCH_SUFFIX}
 	#Build for ${OS}${ARCH_SUFFIX}
-	${CC} ${CFLAGS} $< -o $@
+	${CC} ${CFLAGS} $< -o $@ ${LIB}
 
 ${TTARGET_NAME}: test${SRC_NAME} ${OS}${ARCH_SUFFIX}
 	${CC} -DXDG_UNIX -L${OS}${ARCH_SUFFIX} -l${NAME} -lstdc++ $< -o $@
